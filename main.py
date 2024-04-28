@@ -1,9 +1,22 @@
 import datetime
+from flask import Flask, render_template
 from data import db_session
 from data.users import User, Jobs
 
+app = Flask(__name__)
 
-def main():
+
+@app.route('/')
+def index():
+    db_sess = db_session.create_session()
+    jobs = db_sess.query(Jobs).all()
+    for job in jobs:
+        team_leader = db_sess.query(User).get(job.team_leader)
+        job.team_leader = f'{team_leader.name} {team_leader.surname}'
+    return render_template('jobs.html', jobs=jobs)
+
+
+if __name__ == '__main__':
     db_session.global_init("db/blogs.db")
 
     users = [
@@ -26,17 +39,16 @@ def main():
         new_user.email = email
         db_sess.add(new_user)
 
-    new_job = Jobs()
-    new_job.team_leader = 1
-    new_job.job = 'deployment of residential modules 1 and 2'
-    new_job.work_size = 15
-    new_job.collaborators = '2, 3'
-    new_job.start_date = datetime.datetime.now()
-    new_job.is_finished = False
-    db_sess.add(new_job)
+    for i in range(5):
+        new_job = Jobs()
+        new_job.team_leader = 1
+        new_job.job = 'deployment of residential modules 1 and 2'
+        new_job.work_size = 15
+        new_job.collaborators = '2, 3'
+        new_job.start_date = datetime.datetime.now()
+        new_job.is_finished = False
+        db_sess.add(new_job)
 
     db_sess.commit()
 
-
-if __name__ == '__main__':
-    main()
+    app.run()
