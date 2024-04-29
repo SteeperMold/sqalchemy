@@ -12,3 +12,11 @@ class CreateJobForm(FlaskForm):
     end_date = DateTimeLocalField('Дата окончания работы', format='%Y-%m-%dT%H:%M')
     is_finished = BooleanField('Закончена ли работа?')
     submit = SubmitField('Сохранить')
+
+
+class CreateDepartmentForm(FlaskForm):
+    title = StringField('Название департамента', validators=[DataRequired()])
+    chief = StringField('Id шефа департамента', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
+    members = StringField('Участники департамента', validators=[DataRequired()])
+    submit = SubmitField('Сохранить')
