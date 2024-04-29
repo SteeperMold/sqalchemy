@@ -11,4 +11,4 @@ class CreateJobForm(FlaskForm):
     start_date = DateTimeLocalField('Дата начала работы', format='%Y-%m-%dT%H:%M')
     end_date = DateTimeLocalField('Дата окончания работы', format='%Y-%m-%dT%H:%M')
     is_finished = BooleanField('Закончена ли работа?')
-    submit = SubmitField('Создать')
+    submit = SubmitField('Сохранить')

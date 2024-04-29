@@ -1,29 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-    <h1 class="text-center">Works log</h1>
-    {% for job in jobs %}
-    <h2>Action # {{ loop.index }}</h2>
-    <table class="table">
-        <thead>
-        <tr class="bg-warning">
-            <th>Title of activity</th>
-            <th>Team leader</th>
-            <th>Duration</th>
-            <th>List of collaborators</th>
-            <th>Is finished</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>{{ job.job }}</td>
-            <td>{{ job.team_leader }}</td>
-            <td>{{ job.work_size }} hours</td>
-            <td>{{ job.collaborators }}</td>
-            <td>{{ "finished" if job.completed else "is not finished" }}</td>
-        </tr>
-        </tbody>
-    </table>
-    {% endfor %}
-</div>
+    <div class="container mt-5">
+        <h1 class="text-center">Works log</h1>
+        {% if current_user.is_authenticated %}
+            <a href="/add_job" class="btn-info btn-lg mb-5">Add job</a>
+        {% endif %}
+        {% for job in jobs %}
+            <h2>Action # {{ loop.index }}</h2>
+            <table class="table">
+                <thead>
+                <tr class="bg-warning">
+                    <th>Title of activity</th>
+                    <th>Team leader</th>
+                    <th>Duration</th>
+                    <th>List of collaborators</th>
+                    <th>Is finished</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{ job.job }}</td>
+                    <td>{{ job.team_leader }}</td>
+                    <td>{{ job.work_size }} hours</td>
+                    <td>{{ job.collaborators }}</td>
+                    <td>{{ "finished" if job.is_finished else "is not finished" }}</td>
+                </tr>
+                </tbody>
+            </table>
+            {% if job.team_leader == current_user.id or current_user.id == 1 %}
+                <a href="/edit_job/{{ job.id }}" class="btn-warning btn-lg">Edit job</a>
+                <a href="/delete_job/{{ job.id }}" class="btn-danger btn-lg">Delete job</a>
+            {% endif %}
+        {% endfor %}
+    </div>
 {% endblock %}

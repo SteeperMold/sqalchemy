@@ -1,6 +1,5 @@
-import datetime
-from flask import Flask, render_template, redirect
-from flask_login import login_user, login_required, logout_user, LoginManager
+from flask import Flask, render_template, redirect, request
+from flask_login import login_user, login_required, logout_user, LoginManager, current_user
 from data import db_session
 from data.users import User, Jobs
 from forms.user import RegisterForm, LoginForm
@@ -36,7 +35,7 @@ def add_job():
             collaborators=form.collaborators.data,
             start_date=form.start_date.data,
             end_date=form.end_date.data,
-            is_finished=form.is_finished.data
+            is_finished=form.is_finished.data,
         )
 
         db_sess = db_session.create_session()
@@ -45,7 +44,61 @@ def add_job():
 
         return redirect('/')
 
-    return render_template('add_job.html', form=form)
+    return render_template('add_job.html', title='Создание работы', form=form)
+
+
+@app.route('/edit_job/<int:id>', methods=['GET', 'POST'])
+def edit_job(id):
+    db_sess = db_session.create_session()
+    job = db_sess.query(Jobs).filter(Jobs.id == id).first()
+
+    if not job:
+        return render_template('add_job.html', title='Изменение работы', message='Работа не найдена')
+
+    if current_user.id not in (job.team_leader, 1):
+        return render_template('add_job.html', title='Изменение работы', message='Недостаточно прав для редактирования')
+
+    data = {
+        'team_leader': job.team_leader,
+        'job': job.job,
+        'work_size': job.work_size,
+        'collaborators': job.collaborators,
+        'start_date': job.start_date,
+        'end_date': job.end_date,
+        'is_finished': job.is_finished,
+    }
+
+    form = CreateJobForm(data=data)
+
+    if form.validate_on_submit():
+        job.team_leader = form.team_leader.data
+        job.job = form.job.data
+        job.work_size = form.work_size.data
+        job.collaborators = form.collaborators.data
+        job.start_date = form.start_date.data
+        job.end_date = form.end_date.data
+        job.is_finished = form.is_finished.data
+        db_sess.commit()
+        return redirect('/')
+
+    return render_template('add_job.html', title='Изменение работы', form=form)
+
+
+@app.route('/delete_job/<int:id>')
+def delete_job(id):
+    db_sess = db_session.create_session()
+    job = db_sess.query(Jobs).filter(Jobs.id == id).first()
+
+    if not job:
+        return redirect('/')
+
+    if current_user.id not in (job.team_leader, 1):
+        return redirect('/')
+
+    db_sess.delete(job)
+    db_sess.commit()
+
+    return redirect('/')
 
 
 @app.route('/register', methods=['GET', 'POST'])

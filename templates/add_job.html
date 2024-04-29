@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 class="text-center">Создание работы</h1>
-    <form action="" method="post" class="container">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.team_leader.label }}<br>
-            {{ form.team_leader(class="form-control") }}<br>
-            {% for error in form.team_leader.errors %}
-                <p class="alert alert-danger" role="alert">
-                    {{ error }}
-                </p>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.job.label }}<br>
-            {{ form.job(class="form-control") }}<br>
-            {% for error in form.job.errors %}
-                <p class="alert alert-danger" role="alert">
-                    {{ error }}
-                </p>
-            {% endfor %}
-        </p>
+    <h1 class="text-center">{{ title }}</h1>
+    <h2 class="text-center">{{ message }}</h2>
+    {% if form %}
+        <form action="" method="post" class="container">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.team_leader.label }}<br>
+                {{ form.team_leader(class="form-control") }}<br>
+                {% for error in form.team_leader.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.job.label }}<br>
+                {{ form.job(class="form-control") }}<br>
+                {% for error in form.job.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </p>
         <p>
             {{ form.work_size.label }}<br>
             {{ form.work_size(class="form-control") }}<br>
@@ -70,4 +72,5 @@
         <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
         {{ message }}
     </form>
+    {% endif %}
 {% endblock %}
