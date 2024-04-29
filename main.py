@@ -1,4 +1,5 @@
-from flask import Flask, render_template, redirect, request
+import requests
+from flask import Flask, render_template, redirect
 from flask_login import login_user, login_required, logout_user, LoginManager, current_user
 from data import db_session
 from data.users import User, Jobs, Department
@@ -6,6 +7,7 @@ from forms.user import RegisterForm, LoginForm
 from forms.creation_forms import CreateJobForm, CreateDepartmentForm
 from data.jobs_api import blueprint as jobs_bp
 from data.users_api import blueprint as users_bp
+from geocoder import get_ll_span
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'afdafggzv.,xkmc'
@@ -181,6 +183,26 @@ def delete_department(id):
     return redirect('/departments')
 
 
+@app.route('/users_show/<int:user_id>')
+def users_show(user_id):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+
+    ll, spn = get_ll_span(user.city_from)
+
+    params = {
+        'll': ll,
+        'l': 'sat',
+        'spn': spn
+    }
+    response = requests.get("https://static-maps.yandex.ru/1.x/", params=params)
+
+    with open(f'static/city_images/{user.city_from}.png', "wb") as file:
+        file.write(response.content)
+
+    return render_template('users_show.html', user=user, image=f'/static/city_images/{user.city_from}.png')
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -202,6 +224,7 @@ def register():
             position=form.position.data,
             speciality=form.speciality.data,
             address=form.address.data,
+            city_from=form.city_from.data,
             email=form.email.data,
         )
 
