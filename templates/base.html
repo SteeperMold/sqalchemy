@@ -21,8 +21,19 @@
 </head>
 <body>
 
-<h1>Миссия Колонизация Марса</h1>
-<h4>И на Марсе будут яблони цвести!</h4>
+<nav class="container text-center justify-content-between">
+    <div class="row">
+        <h1 class="col">Миссия Колонизация Марса</h1>
+        {% if current_user.is_authenticated %}
+            <a class="col" href="/logout">{{ current_user.name }} {{ current_user.surname }}</a>
+        {% else %}
+            <a class="col" href="/register">Зарегистрироваться</a>
+            <a class="col" href="/login">Войти в аккаунт</a>
+        {% endif %}
+    </div>
+    <h4 class="row">И на Марсе будут яблони цвести!</h4>
+
+</nav>
 {% block content %}{% endblock %}
 
 </body>
